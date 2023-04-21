@@ -65,7 +65,7 @@ class LRUKReplacer {
    * timestamp overall.
    *
    * Successful eviction of a frame should decrement the size of replacer and remove the frame's
-   * access history.
+   * access history_.
    *
    * @param[out] frame_id id of frame that is evicted.
    * @return true if a frame is evicted successfully, false if no frames can be evicted.
@@ -76,7 +76,7 @@ class LRUKReplacer {
    * TODO(P1): Add implementation
    *
    * @brief Record the event that the given frame id is accessed at current timestamp.
-   * Create a new entry for access history if frame id has not been seen before.
+   * Create a new entry for access history_ if frame id has not been seen before.
    *
    * If frame id is invalid (ie. larger than replacer_size_), throw an exception. You can
    * also use BUSTUB_ASSERT to abort the process if frame id is invalid.
@@ -107,7 +107,7 @@ class LRUKReplacer {
   /**
    * TODO(P1): Add implementation
    *
-   * @brief Remove an evictable frame from replacer, along with its access history.
+   * @brief Remove an evictable frame from replacer, along with its access history_.
    * This function should also decrement replacer's size if removal is successful.
    *
    * Note that this is different from evicting a frame, which always remove the frame
@@ -140,6 +140,12 @@ class LRUKReplacer {
   [[maybe_unused]] size_t replacer_size_;
   [[maybe_unused]] size_t k_;
   std::mutex latch_;
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> cache_map_;
+  std::list<frame_id_t> cache_;
+  std::unordered_map<frame_id_t, std::list<frame_id_t>::iterator> history_map_;
+  std::list<frame_id_t> history_;
+  std::unordered_map<frame_id_t, size_t> records_;
+  std::unordered_map<frame_id_t, bool> is_evictable_;
 };
 
 }  // namespace bustub
