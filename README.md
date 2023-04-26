@@ -32,7 +32,8 @@ lab课程网站：[课程网站](https://15445.courses.cs.cmu.edu/fall2022)
 
 
 最后附加上2022课程的gradescope  [gradescope](https://www.gradescope.com/courses/425272)
-
+课程代码 PXWVR5
+学校记得填Carnegie Mellon University
 ## 项目课程笔记
 ### project 0 ： Concurrent Trie
 实现一个字典树，检查实验者代码水平
