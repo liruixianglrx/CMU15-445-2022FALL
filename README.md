@@ -36,8 +36,9 @@ lab课程网站：[课程网站](https://15445.courses.cs.cmu.edu/fall2022)
 我是自己编译然后加环境变量里面的，先贴一个官网：[https://clang.llvm.org/get_started.html](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)
 
 首先安装cmake等必要的东西
-`sudo apt-get install build-essential
-sudo apt-get install cmake ninja-build`
+```sudo apt-get install build-essential
+
+sudo apt-get install cmake ninja-build```
 
 克隆llvm：
 `git clone https://github.com/llvm/llvm-project.git
@@ -61,12 +62,11 @@ ninja && sudo ninja install -j4
 
 添加环境变量
 vim ~/.bashrc,在最后加上
-`#llvm-14
+
+```#llvm-14
 export C=clang
-
 export CXX=clang++
-
-export LD=lld`
+export LD=lld```
 
 ![image](https://user-images.githubusercontent.com/99662709/234539232-37bb8119-3794-4f5d-9764-331e500047b3.png)
 
