@@ -57,6 +57,7 @@ ninja && sudo ninja install -j4
 看眼clang和llvm版本
 `clang --version`
 ![image](https://user-images.githubusercontent.com/99662709/234535526-e2b96a58-ecf0-4403-8c00-8223f08042e7.png)
+这里正确的version应该是12，因为我一开始15445项目拉的最新的库，当时要求的是llvm14,懒得再重新编译了就直接用的14
 
 添加环境变量
 vim ~/.bashrc,在最后加上
