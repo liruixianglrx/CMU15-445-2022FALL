@@ -36,9 +36,11 @@ lab课程网站：[课程网站](https://15445.courses.cs.cmu.edu/fall2022)
 我是自己编译然后加环境变量里面的，先贴一个官网：[https://clang.llvm.org/get_started.html](https://llvm.org/docs/GettingStarted.html#getting-the-source-code-and-building-llvm)
 
 首先安装cmake等必要的东西
-```sudo apt-get install build-essential
+```
+sudo apt-get install build-essential
+sudo apt-get install cmake ninja-build
+```
 
-sudo apt-get install cmake ninja-build```
 
 克隆llvm：
 `git clone https://github.com/llvm/llvm-project.git
