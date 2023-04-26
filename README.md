@@ -33,7 +33,8 @@ lab课程网站：[课程网站](https://15445.courses.cs.cmu.edu/fall2022)
 
 
 ### llvm14安装：
-我是自己编译然后加环境变量里面的，先贴一个官网：
+我是自己编译然后加环境变量里面的，先贴一个官网：https://clang.llvm.org/get_started.html
+
 首先安装cmake等必要的东西
 `sudo apt-get install build-essential
 sudo apt-get install cmake ninja-build`
@@ -44,7 +45,9 @@ cd llvm-project`
 切换到课程要求的llvm12
 `git checkout -b 12.x remotes/origin/release/12.x`
 
-然后按照官网的步骤编译源码
+然后按照官网的步骤编译源码，主要是这段有用
+![image](https://user-images.githubusercontent.com/99662709/234539957-21ddcb45-799d-426d-b845-20f4369cdc6a.png)
+
 `
 cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DCMAKE_BUILD_TYPE=Release
 ninja && sudo ninja install -j4
@@ -58,7 +61,9 @@ ninja && sudo ninja install -j4
 vim ~/.bashrc,在最后加上
 `#llvm-14
 export C=clang
+
 export CXX=clang++
+
 export LD=lld`
 
 ![image](https://user-images.githubusercontent.com/99662709/234539232-37bb8119-3794-4f5d-9764-331e500047b3.png)
