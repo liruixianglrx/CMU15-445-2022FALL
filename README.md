@@ -28,6 +28,7 @@ lab课程网站：[课程网站](https://15445.courses.cs.cmu.edu/fall2022)
 
 
 最后有个很坑的点就是查看你cmake时使用的编译器是不是课程要求的llvm-14，我之前用成GNU11.3.0导致所有的多线程测试直接就过了,尽管我还没有加锁
+
 ![image](https://user-images.githubusercontent.com/99662709/234530461-7a5f1f8e-1f60-41da-9e23-85831bf4a9ae.png)
 
 
