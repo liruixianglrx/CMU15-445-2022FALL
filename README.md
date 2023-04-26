@@ -52,7 +52,7 @@ cd llvm-project`
 ![image](https://user-images.githubusercontent.com/99662709/234539957-21ddcb45-799d-426d-b845-20f4369cdc6a.png)
 
 ```
-cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;compiler-rt" -DCMAKE_BUILD_TYPE=Release
+cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DLLVM_ENABLE_RUNTIMES="compiler-rt" -DCMAKE_BUILD_TYPE=Release
 
 cd build
 
@@ -61,14 +61,13 @@ ninja && sudo ninja install -j4
 
 看眼clang和llvm版本
 `clang --version`
-![image](https://user-images.githubusercontent.com/99662709/234535526-e2b96a58-ecf0-4403-8c00-8223f08042e7.png)
-这里正确的version应该是12，因为我一开始15445项目拉的最新的库，当时要求的是llvm14,懒得再重新编译了就直接用的14
+![image](https://user-images.githubusercontent.com/99662709/234564542-2aca8ec2-c30d-4ff4-af16-e16c26745d66.png)
 
 添加环境变量
 vim ~/.bashrc,在最后加上
 
 ```
-#llvm-14
+#llvm-12
 export C=clang
 export CXX=clang++
 export LD=lld
