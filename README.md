@@ -51,11 +51,11 @@ cd llvm-project`
 然后按照官网的步骤编译源码，主要是这段有用
 ![image](https://user-images.githubusercontent.com/99662709/234539957-21ddcb45-799d-426d-b845-20f4369cdc6a.png)
 
-`
+```
 cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DCMAKE_BUILD_TYPE=Release
 
 ninja && sudo ninja install -j4
-`
+```
 
 看眼clang和llvm版本
 `clang --version`
@@ -65,10 +65,12 @@ ninja && sudo ninja install -j4
 添加环境变量
 vim ~/.bashrc,在最后加上
 
-```#llvm-14
+```
+#llvm-14
 export C=clang
 export CXX=clang++
-export LD=lld```
+export LD=lld
+```
 
 ![image](https://user-images.githubusercontent.com/99662709/234539232-37bb8119-3794-4f5d-9764-331e500047b3.png)
 
