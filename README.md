@@ -52,7 +52,9 @@ cd llvm-project`
 ![image](https://user-images.githubusercontent.com/99662709/234539957-21ddcb45-799d-426d-b845-20f4369cdc6a.png)
 
 ```
-cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DCMAKE_BUILD_TYPE=Release
+cmake -S llvm -B build -G Ninja -DLLVM_ENABLE_PROJECTS='clang;clang-tools-extra;lldb;lld' -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;compiler-rt" -DCMAKE_BUILD_TYPE=Release
+
+cd build
 
 ninja && sudo ninja install -j4
 ```
