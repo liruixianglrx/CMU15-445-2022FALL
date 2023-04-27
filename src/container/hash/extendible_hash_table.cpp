@@ -17,6 +17,7 @@
 #include <list>
 #include <utility>
 
+#include "common/logger.h"
 #include "container/hash/extendible_hash_table.h"
 #include "storage/page/page.h"
 
@@ -24,7 +25,9 @@ namespace bustub {
 
 template <typename K, typename V>
 ExtendibleHashTable<K, V>::ExtendibleHashTable(size_t bucket_size) : bucket_size_(bucket_size) {
+  // LOG_INFO("initiating hash :bucket_size= %zu", bucket_size);
   std::shared_ptr<Bucket> bptr = std::make_shared<Bucket>(bucket_size, global_depth_);
+  latches_[bptr] = std::make_unique<std::shared_mutex>();
   dir_.push_back(bptr);
 }
 
@@ -36,8 +39,10 @@ auto ExtendibleHashTable<K, V>::IndexOf(const K &key) -> size_t {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::GetGlobalDepth() const -> int {
-  std::scoped_lock<std::mutex> lock(latch_);
-  return GetGlobalDepthInternal();
+  latch_.lock_shared();
+  int golbal_depth = GetGlobalDepthInternal();
+  latch_.unlock_shared();
+  return golbal_depth;
 }
 
 template <typename K, typename V>
@@ -47,8 +52,10 @@ auto ExtendibleHashTable<K, V>::GetGlobalDepthInternal() const -> int {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::GetLocalDepth(int dir_index) const -> int {
-  std::scoped_lock<std::mutex> lock(latch_);
-  return GetLocalDepthInternal(dir_index);
+  latches_[dir_[dir_index]]->lock_shared();
+  auto local_depth = GetLocalDepthInternal(dir_index);
+  latches_[dir_[dir_index]]->unlock_shared();
+  return local_depth;
 }
 
 template <typename K, typename V>
@@ -58,8 +65,10 @@ auto ExtendibleHashTable<K, V>::GetLocalDepthInternal(int dir_index) const -> in
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::GetNumBuckets() const -> int {
-  std::scoped_lock<std::mutex> lock(latch_);
-  return GetNumBucketsInternal();
+  latch_.lock_shared();
+  int num_buckets = GetNumBucketsInternal();
+  latch_.unlock_shared();
+  return num_buckets;
 }
 
 template <typename K, typename V>
@@ -69,36 +78,57 @@ auto ExtendibleHashTable<K, V>::GetNumBucketsInternal() const -> int {
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Find(const K &key, V &value) -> bool {
-  // UNREACHABLE("not implemented");
-  std::scoped_lock<std::mutex> lock(latch_);
-
+  latch_.lock_shared();
   int idx = IndexOf(key);
+  latches_[dir_[idx]]->lock_shared();
   auto tmp = dir_[idx]->Find(key, value);
+  latches_[dir_[idx]]->unlock_shared();
+  latch_.unlock_shared();
   return tmp;
 }
 
 template <typename K, typename V>
 auto ExtendibleHashTable<K, V>::Remove(const K &key) -> bool {
-  // UNREACHABLE("not implemented");
-  std::scoped_lock<std::mutex> lock(latch_);
-
+  latch_.lock_shared();
   int idx = IndexOf(key);
+  latches_[dir_[idx]]->lock();
   auto tmp = dir_[idx]->Remove(key);
+  latches_[dir_[idx]]->unlock();
+  latch_.unlock_shared();
   return tmp;
 }
 
 template <typename K, typename V>
 void ExtendibleHashTable<K, V>::Insert(const K &key, const V &value) {
-  std::scoped_lock<std::mutex> lock(latch_);
-  return InsertInternal(key, value);
+  latch_.lock_shared();
+  int idx = IndexOf(key);
+
+  latches_[dir_[idx]]->lock();
+  bool insert_result = dir_[idx]->Insert(key, value);
+
+  latches_[dir_[idx]]->unlock();
+  latch_.unlock_shared();
+  // maybe release latch_ right now
+
+  // can be written better
+  if (!insert_result) {
+    StrictInsert(key, value);
+    return;
+  }
 }
 
 template <typename K, typename V>
-void ExtendibleHashTable<K, V>::InsertInternal(const K &key, const V &value) {
+void ExtendibleHashTable<K, V>::StrictInsert(const K &key, const V &value) {
+  latch_.lock();
+
   int idx = IndexOf(key);
+
+  latches_[dir_[idx]]->lock();
   bool insert_result = dir_[idx]->Insert(key, value);
 
   if (insert_result) {
+    latches_[dir_[idx]]->unlock();
+    latch_.unlock();
     return;
   }
 
@@ -106,10 +136,18 @@ void ExtendibleHashTable<K, V>::InsertInternal(const K &key, const V &value) {
   if (ExtendibleHashTable<K, V>::GetGlobalDepthInternal() == local_depth) {
     ExtendibleHashTable<K, V>::DoubleDir(idx);
     dir_[idx]->IncrementDepth();
+
+    latches_[dir_[idx + (1 << (global_depth_ - 1))]]->lock();
     RedistributeBucket(dir_[idx]);
-    InsertInternal(key, value);
+    latches_[dir_[idx + (1 << (global_depth_ - 1))]]->unlock();
+    latches_[dir_[idx]]->unlock();
+    latch_.unlock();
+    Insert(key, value);
   } else {
     std::shared_ptr<Bucket> bptr = std::make_shared<Bucket>(bucket_size_, local_depth);
+    latches_[bptr] = std::make_unique<std::shared_mutex>();
+    latches_[bptr]->lock();
+
     int mask = (1 << local_depth);
 
     for (int i = 0; i < 1 << global_depth_; i++) {
@@ -119,11 +157,17 @@ void ExtendibleHashTable<K, V>::InsertInternal(const K &key, const V &value) {
         }
       }
     }
+
     RedistributeBucket(dir_[idx]);
     dir_[idx]->IncrementDepth();
     bptr->IncrementDepth();
-    num_buckets_++;
-    InsertInternal(key, value);
+
+    num_buckets_++;  // atomic
+
+    latches_[bptr]->unlock();
+    latches_[dir_[idx]]->unlock();
+    latch_.unlock();
+    Insert(key, value);
   }
 }
 
@@ -135,9 +179,12 @@ void ExtendibleHashTable<K, V>::DoubleDir(const int &idx) {
   }
 
   std::shared_ptr<Bucket> bptr = std::make_shared<Bucket>(bucket_size_, global_depth_ + 1);
+
+  // latch_for_num_bucket_ this lock isnt needed
   num_buckets_++;
 
   dir_[idx + (1 << global_depth_)] = bptr;
+  latches_[bptr] = std::make_unique<std::shared_mutex>();
   ++global_depth_;
 }
 
