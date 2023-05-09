@@ -10,10 +10,13 @@
 //===----------------------------------------------------------------------===//
 #pragma once
 
+#include <algorithm>
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
+#include "common/rwlatch.h"
 #include "concurrency/transaction.h"
 #include "storage/index/index_iterator.h"
 #include "storage/page/b_plus_tree_internal_page.h"
@@ -22,6 +25,8 @@
 namespace bustub {
 
 #define BPLUSTREE_TYPE BPlusTree<KeyType, ValueType, KeyComparator>
+
+enum class Operation { SEARCH, INSERT, DELETE };
 
 /**
  * Main class providing the API for the Interactive B+ Tree.
@@ -82,6 +87,17 @@ class BPlusTree {
 
   void ToString(BPlusTreePage *page, BufferPoolManager *bpm) const;
 
+  auto FindLeafPage(const KeyType &key, Operation operation, Transaction *transaction = nullptr) -> Page *;
+  auto FindLeftMostLeafNode() const -> BPlusTreePage *;
+  auto FindRightMostLeafNode() const -> BPlusTreePage *;
+  auto FindParentPage(const BPlusTreePage *child_node) const -> Page *;
+  template <typename PageType>
+  void StoleFrom(PageType *target_node, PageType *source_node, InternalPage *parent_node, int index, bool is_left);
+  template <typename PageType>
+  void MergeFrom(PageType *target_node, PageType *source_node, int index, bool is_left);
+  void RemoveInternalPageKey(InternalPage *target_node, int index);
+  void InsertInParent(BPlusTreePage *child_node, const KeyType &key, const page_id_t &value, Transaction *transaction);
+  void ReleaseLatchFromQueue(Transaction *transaction);
   // member variable
   std::string index_name_;
   page_id_t root_page_id_;
@@ -89,6 +105,7 @@ class BPlusTree {
   KeyComparator comparator_;
   int leaf_max_size_;
   int internal_max_size_;
+  ReaderWriterLatch root_page_id_lock_;
 };
 
 }  // namespace bustub

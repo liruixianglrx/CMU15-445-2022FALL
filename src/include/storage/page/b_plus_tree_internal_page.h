@@ -40,7 +40,15 @@ class BPlusTreeInternalPage : public BPlusTreePage {
 
   auto KeyAt(int index) const -> KeyType;
   void SetKeyAt(int index, const KeyType &key);
+  void SetValueAt(int index, const ValueType &value);
   auto ValueAt(int index) const -> ValueType;
+  auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
+  void MoveHalfTo(BPlusTreeInternalPage *target, BufferPoolManager *bpm);
+  auto IndexOfKey(const KeyType &key, const KeyComparator &comparator) -> int;
+  void ReSiring(int index, int size, BufferPoolManager *bpm);
+  void Delete(int index);
+  void Resiring(int index, int size, BufferPoolManager *bpm);
+  auto GetItems() -> MappingType * { return array_; }
 
  private:
   // Flexible array member for page data.
