@@ -12,11 +12,16 @@ namespace bustub {
  * set your own input parameters
  */
 INDEX_TEMPLATE_ARGUMENTS
-INDEXITERATOR_TYPE::IndexIterator(int index, LeafPage *leaf_page, BufferPoolManager *bpm)
-    : index_(index), leaf_page_(leaf_page), bpm_(bpm) {}
+INDEXITERATOR_TYPE::IndexIterator(int index, Page *page, BufferPoolManager *bpm)
+    : index_(index), page_(page), bpm_(bpm) {
+  leaf_page_ = reinterpret_cast<LeafPage *>(page->GetData());
+}
 
 INDEX_TEMPLATE_ARGUMENTS
-INDEXITERATOR_TYPE::~IndexIterator() { bpm_->UnpinPage(leaf_page_->GetPageId(), 0); }  // NOLINT
+INDEXITERATOR_TYPE::~IndexIterator() {
+  page_->RUnlatch();
+  bpm_->UnpinPage(leaf_page_->GetPageId(), false);
+}  // NOLINT
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::IsEnd() -> bool {

@@ -88,14 +88,15 @@ class BPlusTree {
   void ToString(BPlusTreePage *page, BufferPoolManager *bpm) const;
 
   auto FindLeafPage(const KeyType &key, Operation operation, Transaction *transaction = nullptr) -> Page *;
-  auto FindLeftMostLeafNode() const -> BPlusTreePage *;
-  auto FindRightMostLeafNode() const -> BPlusTreePage *;
+  auto FindLeftMostLeafPage() -> Page *;
+  auto FindRightMostLeafPage() -> Page *;
   auto FindParentPage(const BPlusTreePage *child_node) const -> Page *;
   template <typename PageType>
-  void StoleFrom(PageType *target_node, PageType *source_node, InternalPage *parent_node, int index, bool is_left);
+  void StoleFrom(PageType *target_node, PageType *source_node, InternalPage *parent_node, int index, bool is_left,
+                 Transaction *transaction);
   template <typename PageType>
   void MergeFrom(PageType *target_node, PageType *source_node, int index, bool is_left);
-  void RemoveInternalPageKey(InternalPage *target_node, int index);
+  void RemoveInternalPageKey(InternalPage *target_node, int index, Transaction *transaction);
   void InsertInParent(BPlusTreePage *child_node, const KeyType &key, const page_id_t &value, Transaction *transaction);
   void ReleaseLatchFromQueue(Transaction *transaction);
   // member variable
