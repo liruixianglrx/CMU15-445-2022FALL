@@ -33,7 +33,7 @@ auto INDEXITERATOR_TYPE::operator*() -> const MappingType & { return *(leaf_page
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
-  LOG_INFO("iterator ++,index %d , size %d", index_, leaf_page_->GetSize());
+  // LOG_INFO("iterator ++,index %d , size %d", index_, leaf_page_->GetSize());
   if (index_ == leaf_page_->GetSize() - 1 && leaf_page_->GetNextPageId() != INVALID_PAGE_ID) {
     bpm_->UnpinPage(leaf_page_->GetPageId(), 0);
     auto *next_page = bpm_->FetchPage(leaf_page_->GetNextPageId());

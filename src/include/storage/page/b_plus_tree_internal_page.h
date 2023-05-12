@@ -49,6 +49,13 @@ class BPlusTreeInternalPage : public BPlusTreePage {
   void Delete(int index);
   void Resiring(int index, int size, BufferPoolManager *bpm);
   auto GetItems() -> MappingType * { return array_; }
+  void PrintItems() {
+    printf("Print items: ");
+    for (int index = 0; index < GetSize(); index++) {
+      printf("%ld ", array_[index].first.ToString());
+    }
+    printf("\n");
+  }
 
  private:
   // Flexible array member for page data.

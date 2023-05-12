@@ -57,6 +57,13 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto Insert(const KeyType &key, const ValueType &value, const KeyComparator &comparator) -> bool;
   // void ReSiring(int index,int size,BufferPoolManager *bpm);
   auto GetItems() -> MappingType * { return array_; }
+  void PrintItems() {
+    printf("Print items: ");
+    for (int index = 0; index < GetSize(); index++) {
+      printf("%ld ", array_[index].first.ToString());
+    }
+    printf("\n");
+  }
 
  private:
   page_id_t next_page_id_;
