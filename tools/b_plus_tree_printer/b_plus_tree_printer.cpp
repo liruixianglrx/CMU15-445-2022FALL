@@ -73,7 +73,7 @@ auto main(int argc, char **argv) -> int {
   GenericComparator<8> comparator(key_schema.get());
 
   auto *disk_manager = new DiskManager("test.db");
-  BufferPoolManager *bpm = new BufferPoolManagerInstance(100, disk_manager);
+  BufferPoolManager *bpm = new BufferPoolManagerInstance(10, disk_manager);
   // create and fetch header_page
   page_id_t page_id;
   auto header_page = bpm->NewPage(&page_id);

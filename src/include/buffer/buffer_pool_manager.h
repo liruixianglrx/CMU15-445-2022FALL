@@ -37,6 +37,7 @@ class BufferPoolManager {
    */
   virtual ~BufferPoolManager() = default;
 
+  virtual void PrintAllFrame() {}
   /** Grading function. Do not modify! */
   auto FetchPage(page_id_t page_id, bufferpool_callback_fn callback = nullptr) -> Page * {
     GradingCallback(callback, CallbackType::BEFORE, page_id);

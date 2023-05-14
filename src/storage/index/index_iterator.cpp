@@ -33,10 +33,15 @@ auto INDEXITERATOR_TYPE::operator*() -> const MappingType & { return *(leaf_page
 
 INDEX_TEMPLATE_ARGUMENTS
 auto INDEXITERATOR_TYPE::operator++() -> INDEXITERATOR_TYPE & {
-  // LOG_INFO("iterator ++,index %d , size %d", index_, leaf_page_->GetSize());
+  // printf("iterator ++ \n");
   if (index_ == leaf_page_->GetSize() - 1 && leaf_page_->GetNextPageId() != INVALID_PAGE_ID) {
-    bpm_->UnpinPage(leaf_page_->GetPageId(), 0);
     auto *next_page = bpm_->FetchPage(leaf_page_->GetNextPageId());
+
+    next_page->RLatch();
+    page_->RUnlatch();
+    bpm_->UnpinPage(page_->GetPageId(), 0);
+
+    page_ = next_page;
     leaf_page_ = reinterpret_cast<LeafPage *>(next_page->GetData());
     index_ = 0;
   } else {

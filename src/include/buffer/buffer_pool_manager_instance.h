@@ -178,5 +178,11 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   // TODO(student): You may add additional private members and helper functions
   auto GetNewFrame(frame_id_t &new_frame_idx) -> bool;
+
+  // void PrintAllFrame() override {
+  //   for (size_t i=0; i< pool_size_; i++) {
+  //     printf("frame %zu page_id %d pin %d\n", i, pages_[i].GetPageId(), pages_[i].GetPinCount());
+  //   }
+  // }
 };
 }  // namespace bustub
